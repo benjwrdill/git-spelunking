@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+  "flag"
 
 	"gopkg.in/src-d/go-git.v4"
+  . "gopkg.in/src-d/go-git.v4/_examples"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
@@ -12,10 +14,21 @@ import (
 // let's start with some g
 
 func main() {
-	Info("git clone https://github.com/src-d/go-siva")
-	r, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
-		URL: "https://github.com/src-d/go-siva",
+  remotePtr := flag.String("remote", "", "a remote git repository to inspect")
+  pathPtr := flag.String("path", ".", "a local git repository to inspect")
+
+  flag.Parse()
+  var r *git.Repository
+  var err error
+  if *remotePtr != "" {
+    Info("git clone " + *remotePtr)
+    r, err = git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+		URL: *remotePtr,
 	})
+  } else {
+    Info("using git against" + *pathPtr)
+    r, err = git.PlainOpen(*pathPtr)
+  }
 	CheckIfError(err)
 
 	Info("git log")
